@@ -1,0 +1,140 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>js</title>
+<script type="text/javascript">
+String.prototype.startWith=function(str){
+	if(str==null||str==""||this.length==0||str.length>this.length)
+	  return false;
+	if(this.substr(0,str.length)==str)
+	  return true;
+	else
+	  return false;
+};
+String.prototype.lastWith=function(str){
+	if(str==null||str==""||this.length==0||str.length>this.length)
+	  return false;
+	if(this.substr(this.length - str.length,this.length)==str)
+	  return true;
+	else
+	  return false;
+};
+
+String.prototype.trim=function(str){
+	 if(!str)str=" ";
+	 var temp = this;
+	 while(temp.startWith(str))
+		  temp = temp.substring(1);
+	 while(temp.lastWith(str))
+		  temp = temp.substring(0,temp.length-1);
+	 return temp;
+	};
+	
+alert("aaaabbbbbbbbb".trim('b'));
+var listener_test = {
+	
+	add:function(actions){
+		this.TESTEVENT.add_listener(actions);
+	},
+	
+	fire_action:function(){
+		this.TESTEVENT.fire_listener();
+	},
+	
+	TESTEVENT:new spotlight_event(this),
+	
+	test_function:function(){
+		
+		alert('test_function');
+	}
+}
+
+function test_function(){
+	this.id = "test_function_id";
+	var self = this;
+	document.getElementById("s2").onclick = function(event){
+		new spotlight_event(self,self.ok).fire_listener(event);
+	};
+
+}
+test_function.prototype.ok=function(args){
+	if(this.self_)
+		var aa =  this.self_;
+	alert('ok');
+};
+
+function add_listener(){
+	listener_test.add(function(){
+		alert('hello world!');
+	});
+}
+
+function fire(){
+	listener_test.fire_action();
+}
+
+
+function spotlight_event(self_,args){
+	this.listeners = new Array();
+	this.add_listener=function(listener){
+		this.listeners.push(listener);
+    };
+    this.fire_listener=function(args){
+    	for(i in this.listeners){
+    		if(typeof(this.listeners[i])=='function')
+				this.listeners[i](args);
+		}
+    };
+    if(self_)
+    	this.listeners.self_ = self_;
+    if(args)
+    	this.add_listener(args);
+}
+
+window.onload=function(){
+	var name = spotlight_util_flex_script(function(){
+		alert('spotlight_util_flex_script');
+	},3);
+	window[name].fire();
+//test.ok();
+}
+
+String.prototype.lastWith=function(str){
+	if(str==null||str==""||this.length==0||str.length>this.length)
+	  return false;
+	if(this.substr(this.length - str.length,this.length)==str)
+	  return true;
+	else
+	  return false;
+};
+
+function spotlight_util_flex_script(function_,args_){
+	var function_name = 'spotlight_util_flex_'+new Date().getTime();
+	var args_name     = '';
+	if(args_){
+		for(i=0;i<args_;i++){
+			args_name = args_name + ('args'+i) + ',';
+		}
+		if(args_name.lastWith(','))
+			args_name = args_name.substring(0,args_name.length-1);
+	}
+	var text_ = "var "+function_name+"={fire:function("+args_name+"){this.listener("+args_name+");}}";
+	
+	var tag = document.createElement('script');
+	tag.setAttribute('type', 'text/javascript');
+	tag.text = text_;
+	document.getElementsByTagName('head')[0].appendChild(tag);
+	window[function_name].listener=function_;
+	return function_name;// + ".fire";
+}
+
+</script>
+
+</head>
+
+<body style="padding:0px 0 0;margin:0;position:relative;font-family:Corbel;font-weight:bold;">
+<a href="JavaScript:add_listener();">add_listener</a>
+<a href="JavaScript:fire();">fire</a>
+<a href="#" id="s2">click</a>
+</body>
+</html>

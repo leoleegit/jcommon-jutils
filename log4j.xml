@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+<!--   ?????  
+%r ?? 0  
+%t ??? main  
+%p ??? DEBUG/INFO/ERROR  
+%c ??????(????)  
+%l ?????,???????  
+%m ??????????,?log(message)??message  
+%n ????????  
+-->
+	<!--  <appender name="appender1"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="logfile08.html" />
+		<param name="MaxFileSize" value="1MB" />
+		<param name="MaxBackupIndex" value="5" />
+		<layout class="org.apache.log4j.HTMLLayout">
+		</layout>
+	</appender>-->
+
+	<appender name="appender1"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="./log/spotlight-ws.log" />
+		<param name="MaxFileSize" value="5MB" />
+		<param name="MaxBackupIndex" value="200" />
+		<!--  ??????????????????????????  -->  
+		<param name="Append" value="true" /> 
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy/MM/dd HH:mm:ss:SSS} %C-%M %m%n" />
+		</layout>
+	</appender>
+
+	<!--??? Console-->
+	<appender name="appender2"
+		class="org.apache.log4j.ConsoleAppender">
+		<param name="Encoding" value="UTF-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy/MM/dd HH:mm:ss:SSS} %C-%M %m%n" />
+		</layout>
+		
+	</appender>
+	<!--??? flie c:/logs/logfile.log-->
+	  <appender name="appender3"
+		class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="c:/logs/spotlight.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" /> 		
+
+		<param name="Encoding" value="UTF-8" />
+		<!--output Pattern see the ?????  at first-->
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy/MM/dd HH:mm:ss:SSS} %C-%M %m%n" />
+		</layout>
+	</appender>
+	<appender name="client-appender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="./logs/spotlight-client.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy/MM/dd HH:mm:ss:SSS} %C-%M %m%n" />
+		</layout>
+	</appender>
+	<!-- all|debug|info|warn|error|fatal|off|null -->
+	<!-- ????????-->	
+	<root>
+		<level value="info" />
+		<appender-ref ref="appender1" />
+		<appender-ref ref="appender2" />
+	</root>
+</log4j:configuration>

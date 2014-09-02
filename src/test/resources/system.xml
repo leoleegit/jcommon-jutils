@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<system_object key="1" value="org.jcommon.com.util.jmx.JmxManager" />
+	<system_object key="2" value="org.jcommon.com.util.share.ShareManager" />
+	<init_threads>500</init_threads>
+	<lib_url>spotlightHome\ws</lib_url>
+	<version>1807</version>
+	<mbean_server>MG_server</mbean_server>
+	<deploy_name>sip_logs</deploy_name>
+	<!--<htmladapter user="admin" password="admin" port="10044" /> -->
+	<!-- <rmiadapter name="rmiadapter" CREDENTIALS="ptsws" addr="192.168.2.72" port="10045" /> -->
+	<ShareObject rmi="rmiadapter" name="mg_share_resource" role="client" CREDENTIALS="ptsws" addr="192.168.2.72" port="10045" />
+</root>
