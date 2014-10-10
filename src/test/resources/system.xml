@@ -9,5 +9,5 @@
 	<deploy_name>sip_logs</deploy_name>
 	<!--<htmladapter user="admin" password="admin" port="10044" /> -->
 	<!-- <rmiadapter name="rmiadapter" CREDENTIALS="ptsws" addr="192.168.2.72" port="10045" /> -->
-	<ShareObject rmi="rmiadapter" name="mg_share_resource" role="client" CREDENTIALS="ptsws" addr="192.168.2.72" port="10045" />
+	<!--<ShareObject rmi="rmiadapter" name="mg_share_resource" role="client" CREDENTIALS="ptsws" addr="192.168.2.72" port="10045" />-->
 </root>

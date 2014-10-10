@@ -4,7 +4,7 @@
 
   <groupId>jcommon</groupId>
   <artifactId>jcommon-jutils</artifactId>
-  <version>1.0-v20140910</version>
+  <version>1.0-v20141009</version>
   <name>jutils Maven Sipapp</name>
   
   <build>

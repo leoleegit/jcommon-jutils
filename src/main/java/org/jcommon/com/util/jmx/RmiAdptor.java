@@ -59,6 +59,7 @@ public class RmiAdptor {
 	
 	private String name;
 	
+	private String user;
 	private String CREDENTIALS;
 	
 	private java.rmi.registry.Registry registry;
@@ -71,9 +72,10 @@ public class RmiAdptor {
 		init(data);
 	}
 	
-	public RmiAdptor(String name,String addr,String CREDENTIALS,int port){
+	public RmiAdptor(String name,String addr,String user,String CREDENTIALS,int port){
 		JSONObject json = new JSONObject();
 		try {
+			json.accumulate("user", user);
 			json.accumulate("name", name);
 			json.accumulate("CREDENTIALS", CREDENTIALS);
 			json.accumulate("addr", addr);
@@ -92,6 +94,7 @@ public class RmiAdptor {
 			return;
 		}
 		try {
+			user = JsonUtils.getValueByKey(data, "user");
 			name = JsonUtils.getValueByKey(data, "name");
 			CREDENTIALS = JsonUtils.getValueByKey(data, "CREDENTIALS");
 			addr = JsonUtils.getValueByKey(data, "addr");
@@ -119,7 +122,7 @@ public class RmiAdptor {
 			return;
 		}
 		ObjectName adapterName = getObjectName();
-		JMXConnectorServer cserver = getCserver();
+		//cserver = getCserver();
 		try {
 			setCserver(JmxManager.instance().getServer());
 			JmxManager.instance().registerMBean(cserver, adapterName);
@@ -201,12 +204,21 @@ public class RmiAdptor {
 		if(CREDENTIALS!=null){
 			authenticator = new JMXAuthenticator() {    
 			    
-	            public Subject authenticate(Object credentials) {      
+	            public Subject authenticate(Object credentials) {  
+	            	logger.info(credentials.getClass().getName() + " is trying connect...");
 	                if (credentials instanceof String) {    
 	                    if (credentials.equals(CREDENTIALS)) {    
 	                        return new Subject();    
 	                    }    
-	                }    
+	                }else if (credentials instanceof String []) {  
+	                	String[] copy = (String[]) credentials;
+	                	String username = copy.length>0?copy[0]:null;
+	                	String passwd   = copy.length>1?copy[1]:null;
+	                	logger.info(username + " is trying connect...");
+	                    if (passwd.equals(CREDENTIALS) && username.equals(user)) {    
+	                        return new Subject();    
+	                    }    
+	                }     
 	                throw new SecurityException("not authicated");    
 	            }    
 	        };
