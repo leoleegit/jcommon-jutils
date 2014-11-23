@@ -1,6 +1,7 @@
 package org.jcommon.com.test;
 
 import org.jcommon.com.util.JsonUtils;
+import org.json.JSONObject;
 
 public class JsonUtilsTest {
 	private String test = "aa fff ddd";
@@ -19,6 +20,8 @@ public class JsonUtilsTest {
 	 
 	 public static void main(String[] args) throws Exception{
 		 
-		 System.out.println(new JsonUtilsTest().toJson());
+		 //System.out.println(new JsonUtilsTest().toJson());
+		 JSONObject jo = new JSONObject("{\"12323\",\"4234324\"}");
+		 System.out.println(jo);
 	 }
 }

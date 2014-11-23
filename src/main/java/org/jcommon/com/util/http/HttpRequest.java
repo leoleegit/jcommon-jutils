@@ -62,6 +62,7 @@ public class HttpRequest
   private String user;
   private String password;
   private Properties properties = new Properties();
+  private Map<Object, Object> attributes = new HashMap<Object, Object>();
 
   private boolean trusted = false;
 
@@ -348,10 +349,23 @@ public class HttpRequest
     this.properties.put(key, value);
   }
 
+  public void setAttribute(Object key, Object value){
+	  this.attributes.put(key, value);
+  }
+  public Object getAttibute(Object key){
+	  if(attributes.containsKey(key))
+		  return attributes.get(key);
+	  return null;
+  }
+  
   public String getProperty(String key) {
     if (this.properties.containsKey(key))
       return this.properties.getProperty(key);
     return null;
+  }
+  
+  public HttpListener getListener(){
+	  return listener_;
   }
 
   public void setAuthorization(String user, String password) {

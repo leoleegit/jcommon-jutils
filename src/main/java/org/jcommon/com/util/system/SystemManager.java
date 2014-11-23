@@ -316,8 +316,22 @@ public class SystemManager extends Monitor implements ServletContextListener {
 		} 
 	}
 	
+	public void setSystemProperty(String key, String value){
+		logger.info(String.format("key:%s;value:%s", key,value));
+		System.setProperty(key, value);
+	}
+	
 	@Override
 	public void initOperation(){
+		addOperation(new MBeanOperationInfo(
+                "setSystemProperty",
+                "set System Property",
+                new MBeanParameterInfo[]{new MBeanParameterInfo(
+                		"key","java.lang.String","key"),
+                		new MBeanParameterInfo(
+                        "value","java.lang.String","value")},   // no parameters
+                "void",
+                MBeanOperationInfo.ACTION));
 		addOperation(new MBeanOperationInfo(
                 "start",
                 "start all modules",

@@ -18,9 +18,11 @@ public class PostTest implements HttpListener{
 //		HttpRequest post = new HttpRequest("http://192.168.2.72/ws/command?cmd=wakeup",new PostTest());
 //		post.setAuthorization("root1", "password.com");
 //		ThreadManager.instance().execute(post);
-		String xml = "<xml><ToUserName><![CDATA[gh_f49bb9a333b3]]></ToUserName><FromUserName><![CDATA[of-YetzJFYxGTltb4eCvgccHzHF0]]></FromUserName><CreateTime>1393401623</CreateTime><MsgType><![CDATA[image]]></MsgType><PicUrl><![CDATA[http://mmbiz.qpic.cn/mmbiz/KicH5B1sk30ea2upvicicXCicmiciblthdQAfnVVdjfSvzJJXVmCmq6bB20Nwmzao101Rym8v29nPdqBrw7X3fV14vUw/0]]></PicUrl><MsgId>5984614401178375290</MsgId><MediaId><![CDATA[AEFjcYxnuX6sdMi-78tCwQEZX5AUM-aPdg_lR1gitHsjufDCDs8ZlcpmrYtp3phq]]></MediaId></xml>";
-		HttpRequest request = new HttpRequest("http://192.168.3.105:8080/scoialmm/callback",xml,"POST",new PostTest());
+		String xml = "<xml><ToUserName><![CDATA[gh_e6e86fdce3b9]]></TooB5EKt7ogUYtzdMbrzVXXA6icGxE]]></FromUserName><CreateTime>1416553641</CreateTime><MsgType><![CDATA[text]]></MsgType><Content>>6084051561327333659</MsgId></xml>"; 
+		HttpRequest request = new HttpRequest("http://192.168.2.31/wss/callback",xml,"POST",new PostTest());
 		ThreadManager.instance().execute(request);
+		
+//		String ss = "C:\\Users\\Administrator\\Desktop\\cipango-distribution-2.0.0\\media\\NhRCvGU8tapYzrstTBLrAVmQclXi9tIYV_dA0VmnS9J_elwvqw44HS7jWxBca8it.jpg";
 	}
 
 	@Override

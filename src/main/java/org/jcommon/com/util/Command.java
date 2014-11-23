@@ -7,7 +7,7 @@ import java.io.UnsupportedEncodingException;
 import org.jcommon.com.util.system.SystemListener;
 import org.jcommon.com.util.system.SystemManager;
 
-public class Command implements SystemListener {
+public abstract class Command implements SystemListener {
     private String help;
     
     public  Command(String help){
@@ -36,6 +36,14 @@ public class Command implements SystemListener {
         while (running) {
             try {
                 final String command = lineReader.readLine();
+                {
+            		// TODO Auto-generated method stub
+            	
+            		if("q".equals(command)){
+            			SystemManager.instance().contextDestroyed(null);
+            			System.exit(0);
+            		}
+            	}
                 handleCommand(command);
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -43,14 +51,7 @@ public class Command implements SystemListener {
         }
 	}
 
-	public void handleCommand(String command) {
-		// TODO Auto-generated method stub
-	
-		if("q".equals(command)){
-			SystemManager.instance().contextDestroyed(null);
-			System.exit(0);
-		}
-	}
+	public abstract void handleCommand(String command);
 
 	@Override
 	public boolean isSynchronized() {
