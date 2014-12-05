@@ -22,10 +22,14 @@ public class ConfigTest {
 //	    
 //	    config.setHtmladapter("{\"user\":\"admin\",\"password\":\"ptsws\",\"port\":\"10042\"}");
 //	    ConfigLoader.saveConf2xml(ConfigTest.class.getResource("/system.xml"), config);
-		String office_hour="00901000";
-		String start_time = office_hour.substring(0, 4);
-		String end_time   = office_hour.substring(4);
-		System.out.println(start_time+"\n"+end_time);
-		System.out.println("a\tb\tc\t");
+//		String office_hour="00901000";
+//		String start_time = office_hour.substring(0, 4);
+//		String end_time   = office_hour.substring(4);
+//		System.out.println(start_time+"\n"+end_time);
+//		System.out.println("a\tb\tc\t");
+		
+		String wechat_key = "gh_e6e86fdce3b9-fegeh";
+		String mywechat_id = wechat_key!=null && wechat_key.indexOf("-")!=-1?wechat_key.substring(0, wechat_key.lastIndexOf("-")):wechat_key;
+		System.out.println(mywechat_id);
 	}
 }

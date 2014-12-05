@@ -53,6 +53,7 @@ public class HttpRequest
   public static Map<String, Integer> trust_host = new HashMap<String, Integer>();
   public static final String GET = "GET";
   public static final String POST = "POST";
+  public static final String DELETE = "DELETE";
   protected String url_;
   protected HttpListener listener_;
   private String content_;
