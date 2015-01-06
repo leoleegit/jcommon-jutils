@@ -8,7 +8,7 @@ import org.jcommon.com.util.thread.ThreadManager;
 
 public class SystemManagerTest implements SystemListener{
 	public static void main(String[] args){
-		DOMConfigurator.configure("log4j_fb.xml");
+		DOMConfigurator.configure("log4j.xml");
 		SystemManager.instance().addListener(new SystemManagerTest());
 		SystemManager s = new SystemManager();
 		SystemManager.instance().addListener(new SystemManagerTest());
@@ -18,6 +18,9 @@ public class SystemManagerTest implements SystemListener{
 		ThreadManager tm = new ThreadManager();
 		System.out.println(sc.instance());
 		System.out.println(tm.instance());
+		
+		System.out.println(new SystemManagerTest().getClass().hashCode());
+		System.out.println(new SystemManagerTest().getClass().hashCode());
 	}
 
 	@Override
