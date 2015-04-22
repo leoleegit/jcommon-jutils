@@ -7,7 +7,7 @@
     version = '1.0-v20150416'
     
     jar {
-		baseName = 'jcommon-jutils'
+		//baseName = 'jcommon-jutils'
 	    manifest{
 	    	attributes 'provider':'gradle'
 	    }
@@ -23,21 +23,8 @@
 	   mavenCentral()
     }
 
-	sourceSets {
-	    main {
-	        java {
-	            srcDir 'src/main/java'
-	            srcDir 'src/test/java'
-	        }
-	        resources {
-	            srcDir 'src/main/resources'
-	            srcDir 'src/test/resources'
-	        }
-	    }
-	}
     dependencies {
         testCompile 'junit:junit:4.11'
-        compile 'jcommon:jcommon-jutils:1.0-v20141204'
         compile 'log4j:log4j:1.2.16'
         runtime 'javax.servlet:servlet-api:2.5'
         compile 'dom4j:dom4j:1.6.1'
@@ -48,3 +35,15 @@
         compile 'dbpool:dbpool:5.0'
     }
  
+ 
+	test {
+		systemProperties 'property': 'value'
+	}
+
+	uploadArchives {
+		repositories {
+		   flatDir {
+			   dirs 'repos'
+		   }
+		}
+	}
