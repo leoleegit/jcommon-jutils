@@ -15,6 +15,7 @@ package org.jcommon.com.util.system;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.jcommon.com.util.config.ConfigLoader;
+import org.jcommon.com.util.health.Status;
 import org.jcommon.com.util.jmx.JmxManager;
 /**
  * 
@@ -64,9 +66,13 @@ public class SystemConfig implements SystemConfigMBean {
 	
 	private String log_path;
 	
-	private boolean standby;
-	
 	private boolean auth;
+	
+	private String command_key;
+	
+	private int command_port;
+	
+	private long boot_time;
 	
 	private Map<String,String> system_user;
 	
@@ -211,11 +217,12 @@ public class SystemConfig implements SystemConfigMBean {
 	}
 
 	public boolean isStandby() {
-		return standby;
+		return Status.StandbyMode.equals(System.getProperty("MODE"));
 	}
 
 	public void setStandby(boolean standby) {
-		this.standby = standby;
+		setBoot_time(new Date().getTime());
+		System.setProperty("MODE", standby?Status.StandbyMode:Status.ActiveMode);
 	}
 
 	public void setAuth(boolean auth) {
@@ -248,5 +255,29 @@ public class SystemConfig implements SystemConfigMBean {
 
 	public String getGroup_id() {
 		return group_id;
+	}
+
+	public void setCommand_port(int command_port) {
+		this.command_port = command_port;
+	}
+
+	public int getCommand_port() {
+		return command_port;
+	}
+
+	public void setCommand_key(String command_key) {
+		this.command_key = command_key;
+	}
+
+	public String getCommand_key() {
+		return command_key;
+	}
+
+	public void setBoot_time(long boot_time) {
+		this.boot_time = boot_time;
+	}
+
+	public long getBoot_time() {
+		return boot_time;
 	}
 }

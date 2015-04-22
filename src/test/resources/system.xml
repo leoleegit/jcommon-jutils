@@ -7,6 +7,8 @@
 	<version>1807</version>
 	<mbean_server>MG_server</mbean_server>
 	<deploy_name>sip_logs</deploy_name>
+	<command_key>SPOTLIGHT</command_key>
+	<command_port>9088</command_port>
 	<!--<htmladapter user="admin" password="admin" port="10044" /> -->
 	<!-- <rmiadapter name="rmiadapter" CREDENTIALS="ptsws" addr="192.168.2.72" port="10045" /> -->
 	<!--<ShareObject rmi="rmiadapter" name="mg_share_resource" role="client" CREDENTIALS="ptsws" addr="192.168.2.72" port="10045" />-->

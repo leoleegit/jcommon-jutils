@@ -1,6 +1,8 @@
 package org.jcommon.com.util.thread;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class TimerTaskManger {
 	private static final TimerTaskManger instance = new TimerTaskManger();
@@ -9,6 +11,12 @@ public class TimerTaskManger {
 	public static TimerTaskManger instance(){
 		return instance;
 	}
+	
+	public TimerTaskManger(){
+		exec = Executors.newSingleThreadScheduledExecutor();
+	}
+	
+	private static ScheduledExecutorService exec; 
 	
 	public Timer schedule(String name, TimerTask task, long delay){
 		Timer timer = new Timer(name==null?this.getClass().getName():name);

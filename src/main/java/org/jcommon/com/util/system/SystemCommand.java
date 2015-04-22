@@ -22,8 +22,6 @@ public class SystemCommand  extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private static final String WAKEUP  = "wakeup";
-	private static final String STANDBY = "standby";
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 	}
@@ -36,22 +34,22 @@ public class SystemCommand  extends HttpServlet {
 		}
 		
 		String cmd_ = request.getParameter("cmd");
+		responseMessage(response,"handling,"+cmd_);
 		if(cmd_!=null){
-			if(WAKEUP.equalsIgnoreCase(cmd_)){
-				SystemConfig.instance().setStandby(false);
-				if(SystemManager.instance().isRunning()){
-					responseMessage(response,"true,spotlight server is running...");
-				}else{
-					SystemManager.instance().start();
-					responseMessage(response,"true,spotlight server is starting...");
-				}
-			}else if(STANDBY.equalsIgnoreCase(cmd_)){
-				SystemConfig.instance().setStandby(true);
-				if(SystemManager.instance().isRunning()){
-					SystemManager.instance().stop();
-				}
-				responseMessage(response,"true,spotlight server is standby...");
-			}else{
+			if ("active".equalsIgnoreCase(cmd_))
+            {
+            	if(SystemConfig.instance().isStandby()){
+                	SystemConfig.instance().setStandby(false);
+                	SystemManager.instance().start();
+            	}
+            }else if ("standby".equalsIgnoreCase(cmd_))
+            {
+            	if(!SystemConfig.instance().isStandby()){
+                	SystemManager.instance().stop();
+                	SystemConfig.instance().setStandby(true);
+                	SystemManager.instance().start();
+            	}  	
+            }else{
 				responseMessage(response,"false,parameter exception");
 				return;
 			}
@@ -103,6 +101,7 @@ public class SystemCommand  extends HttpServlet {
 					}
 				}
 			}
+			responseMessage(response,"true,"+cmd_);
 		}else{
 			responseMessage(response,"false,parameter exception");
 		}

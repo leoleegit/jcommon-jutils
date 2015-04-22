@@ -22,7 +22,9 @@ public class NetworkMonitor implements HttpListener, SystemListener{
 	private Timer timer;
 	private Task  task;
 	private long  period;
+	private long  delay;
 	private String url;
+	private boolean trusted = false;
 	
 	public NetworkMonitor(NetworkListener listener, 
 			long  period, 
@@ -36,7 +38,7 @@ public class NetworkMonitor implements HttpListener, SystemListener{
 	
 		public void run() {
 			// TODO Auto-generated method stub
-			org.jcommon.com.util.thread.ThreadManager.instance().execute(new HttpRequest(url,NetworkMonitor.this));
+			org.jcommon.com.util.thread.ThreadManager.instance().execute(new HttpRequest(url,NetworkMonitor.this,trusted));
 		}	
 	}
 	
@@ -84,12 +86,28 @@ public class NetworkMonitor implements HttpListener, SystemListener{
 		// TODO Auto-generated method stub
 		this.task   = new Task();
 		timer = new Timer(this.getClass().getName());
-		timer.schedule(task, 60, period);
+		timer.schedule(task, getDelay()==0?60:getDelay(), period);
 	}
 
 	@Override
 	public boolean isSynchronized() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void setTrusted(boolean trusted) {
+		this.trusted = trusted;
+	}
+
+	public boolean isTrusted() {
+		return trusted;
+	}
+
+	public void setDelay(long delay) {
+		this.delay = delay;
+	}
+
+	public long getDelay() {
+		return delay;
 	}
 }

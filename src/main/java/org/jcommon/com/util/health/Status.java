@@ -2,10 +2,11 @@ package org.jcommon.com.util.health;
 
 import org.jcommon.com.util.DateUtils;
 import org.jcommon.com.util.JsonObject;
+import org.jcommon.com.util.system.SystemConfig;
 
 public class Status extends JsonObject {
 	private String name;
-	private String status;
+	private String status = StandbyMode;
 	private String update_time;
 	
 	public final static String ActiveMode="ACTIVE";
@@ -20,8 +21,19 @@ public class Status extends JsonObject {
 		this.setStatus(status);
 	}
 	
+	public String toJson(){
+		if(SystemConfig.instance().isStandby())
+			return "\'" + name +"\':\'"+(StandbyMode)+"\'";
+		else
+			return "\'" + name +"\':\'"+(!"OK".equals(status)?"DOWN":"OK")+"\'";
+	}
+	
+	public boolean isOk(){
+		return "OK".equals(status);
+	}
+	
 	public String toString(){
-		return "\"" + name +"\":\""+(!"OK".equals(status)?"DOWN":"OK")+"\"";
+		return super.toJson();
 	}
 
 	public void setStatus(String status) {
@@ -48,4 +60,8 @@ public class Status extends JsonObject {
 	public String getUpdate_time() {
 		return update_time;
 	}
+	
+	public  boolean isEncode() {
+		return false;
+    }
 }

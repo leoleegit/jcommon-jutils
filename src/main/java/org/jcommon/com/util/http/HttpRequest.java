@@ -113,15 +113,18 @@ public class HttpRequest
     try {
       url = new URL(this.url_);
 
-      if ((this.url_ != null) && (this.url_.startsWith("https")) && (!this.trusted)) {
-        try {
-          factory = verifyCert();
-        }
-        catch (Exception e) {
-          logger.error("verifyCert:", e);
-          if (this.listener_ != null) this.listener_.onException(this, e);
-          return;
-        }
+      if ((this.url_ != null) && (this.url_.startsWith("https"))) {
+    	  if(!this.trusted){
+    		  try {
+    	          factory = verifyCert();
+    	        }
+    	        catch (Exception e) {
+    	          logger.error("verifyCert:", e);
+    	          if (this.listener_ != null) this.listener_.onException(this, e);
+    	          return;
+    	        }
+    	  }
+       
         httpConnection = (HttpsURLConnection)url.openConnection();
         if (factory != null)
           ((HttpsURLConnection)httpConnection).setSSLSocketFactory(factory);
@@ -143,9 +146,14 @@ public class HttpRequest
         httpConnection.setRequestProperty("Accept", "*/*");
       } else if ("POST".equalsIgnoreCase(this.method_)) {
         httpConnection.setDoOutput(true);
-        httpConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        if(properties.getProperty("Content-Type")==null)
+        	httpConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        else
+        	httpConnection.setRequestProperty("Content-Type", properties.getProperty("Content-Type"));
         httpConnection.setRequestProperty("Content-Length", String.valueOf(this.content_.getBytes().length));
 
+        
+        
         PrintWriter out = null;
         out = new PrintWriter(new OutputStreamWriter(httpConnection.getOutputStream(), charsetName));
         out.print(this.content_);
@@ -185,6 +193,9 @@ public class HttpRequest
     catch (IOException e) {
       if (this.listener_ != null) this.listener_.onException(this, e);
       logger.warn(new StringBuilder().append("[HttpReqeust] error:").append(this.url_).append("\n").append(e).toString());
+    }catch (Exception e) {
+        if (this.listener_ != null) this.listener_.onException(this, e);
+        logger.warn(new StringBuilder().append("[HttpReqeust] error:").append(this.url_).append("\n").append(e).toString());
     }
     finally {
       try {

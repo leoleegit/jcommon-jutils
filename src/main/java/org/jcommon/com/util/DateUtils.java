@@ -18,13 +18,21 @@ import java.util.Date;
 public class DateUtils {
 	public static String getNowSinceHour(){
 		Date now=new Date();
-		SimpleDateFormat f=new SimpleDateFormat("hh:mm:ss");
-		return f.format(now);
+		return getNowSinceHour(now);
 	}
 	
 	public static String getNowSinceYear(){
 		Date now=new Date();
-		SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		return getNowSinceYear(now);
+	}
+	
+	public static String getNowSinceYear(Date now){
+		SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return f.format(now);
+	}
+	
+	public static String getNowSinceHour(Date now){
+		SimpleDateFormat f=new SimpleDateFormat("HH:mm:ss");
 		return f.format(now);
 	}
 }

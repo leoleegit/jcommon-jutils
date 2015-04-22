@@ -4,7 +4,7 @@
 
   <groupId>jcommon</groupId>
   <artifactId>jcommon-jutils</artifactId>
-  <version>1.0-v20141225</version>
+  <version>1.0-v20150416</version>
   <name>jutils Maven Sipapp</name>
   
   <build>
@@ -47,9 +47,9 @@
 	   <version>1.2.1</version>
     </dependency>
     <dependency>
-      <groupId>json</groupId>
-      <artifactId>json</artifactId>
-      <version>20080701</version>
+	  <groupId>org.json</groupId>
+	  <artifactId>json</artifactId>
+	  <version>20080701</version>
     </dependency>
     <dependency>
     <groupId>axis</groupId>

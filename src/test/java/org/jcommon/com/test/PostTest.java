@@ -19,16 +19,19 @@ public class PostTest implements HttpListener{
 //		HttpRequest post = new HttpRequest("http://192.168.2.72/ws/command?cmd=wakeup",new PostTest());
 //		post.setAuthorization("root1", "password.com");
 //		ThreadManager.instance().execute(post);
-		String xml = "<xml><ToUserName><![CDATA[gh_e6e86fdce3b9]]></ToUserName><FromUserName><![CDATA[oB5EKtyGPfqHv9d1ZUTR29OsRKDQ]]></FromUserName><CreateTime>1416992264</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[opp]]></Content><MsgId>6085935432767733623</MsgId></xml>";
-		String[] keys   = { "signature","timestamp","nonce" };
-		String[] values = { "aae2b6cda729304c12a81cecae5f484608884c82","1416817797","1256576892" };
-		String callback = "http://192.168.2.31/wss/callback";
-		//String callback = "http://192.168.2.104:8080/jcommon-wechat/callback";
-		String    url   = JsonUtils.toRequestURL(callback, keys, values);
-		
-		HttpRequest request = new HttpRequest(url,xml,"POST",new PostTest());
+//		String xml = "<xml><ToUserName><![CDATA[gh_f49bb9a333b3]]></ToUserName><FromUserName><![CDATA[of-YetzJFYxGTltb4eCvgccHzHF02]]></FromUserName><CreateTime>1420623492</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[Hi]]></Content><MsgId>6101531438271806065</MsgId></xml>";
+//		String[] keys   = { "signature","timestamp","nonce" };
+//		String[] values = { "aae2b6cda729304c12a81cecae5f484608884c82","1416817797","1256576892" };
+//		String callback = "http://192.168.2.31/wss/callback";
+//		//String callback = "http://192.168.2.104:8080/jcommon-wechat/callback";
+//		String    url   = JsonUtils.toRequestURL(callback, keys, values);
+//		
+//		HttpRequest request = new HttpRequest(url,xml,"POST",new PostTest());
+//		ThreadManager.instance().execute(request);
+		//String url = "https://192.168.1.33/wss/FacebookPage";
+		String url = "https://livechat6.pccw.com/chat/livechat.jsp";
+		HttpRequest request = new HttpRequest(url,new PostTest(),true);
 		ThreadManager.instance().execute(request);
-		
 //		String ss = "C:\\Users\\Administrator\\Desktop\\cipango-distribution-2.0.0\\media\\NhRCvGU8tapYzrstTBLrAVmQclXi9tIYV_dA0VmnS9J_elwvqw44HS7jWxBca8it.jpg";
 	}
 

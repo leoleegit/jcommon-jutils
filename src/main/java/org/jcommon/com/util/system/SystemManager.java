@@ -24,10 +24,11 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.jcommon.com.util.SortUtils;
+import org.jcommon.com.util.health.StatusManager;
 import org.jcommon.com.util.jmx.Monitor;
 import org.jcommon.com.util.thread.ThreadManager;
-import org.jcommon.com.util.thread.TimerTaskManger;
 
 /**
  * 
@@ -35,30 +36,46 @@ import org.jcommon.com.util.thread.TimerTaskManger;
  *
  */
 public class SystemManager extends Monitor implements ServletContextListener {
-	private static Logger logger = Logger.getLogger(SystemManager.class);
+	private static Logger logger;
 	
 	private static SystemManager instance;
 	private static URLClassLoader class_loader;
 	private static List<Object> store      = new ArrayList<Object>();
 	
-	public static InputStream init_file_is = SystemManager.class.getResourceAsStream("/system.xml");
+	private static InputStream init_file_is = SystemManager.class.getResourceAsStream("/system.xml");
 	
 	private static final int STARTED  = 1;
 	private static final int STARTING = 2;
 	private static final int END      = 3;
+	private static final int INIT     = 4;
 	
 	private static int status         = END;
+	private CommandMonitor command;
+	
+	private static String HOME = System.getProperty("user.dir");
+	private static String log_file = "log4j.xml";
+	
+	static {
+		if(System.getProperty("jcommon.home")!=null)
+			HOME = System.getProperty("jcommon.home");
+		if(System.getProperty("jcommon.log")!=null)
+			log_file = System.getProperty("jcommon.log");
+		DOMConfigurator.configure(HOME+File.separator+log_file);
+		logger = Logger.getLogger(SystemManager.class);
+	}
 	
 	public static SystemManager instance(){
 		if(instance == null){
+			//instance = new SystemManager();
 			logger.warn("SystemManager not Initialized");
-			instance = new SystemManager();
 		}
 		return instance;
 	}
-	
+
 	public SystemManager(){
 		super("SystemManager");
+		logger.info(this);
+		instance = this;
 	}
 	
 	public boolean isRunning(){
@@ -66,19 +83,14 @@ public class SystemManager extends Monitor implements ServletContextListener {
 	}
 	
 	public void addListener(SystemListener listener){
-		if(isRunning()){
-			ThreadManager.instance().execute(new ListenerTask(listener,true));
-		}
+		ThreadManager.instance().execute(new ListenerTask(listener,true));
 		synchronized(store){
 			((ArrayList<Object>)store).add(listener);
 		}
-		super.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName());
 	}
 	
 	public boolean addListener(int index, SystemListener listener){
-		if(isRunning()){
-			ThreadManager.instance().execute(new ListenerTask(listener,true));
-		}
+		ThreadManager.instance().execute(new ListenerTask(listener,true));
 		synchronized(store){
 			((ArrayList<Object>)store).add(index, listener);
 		}
@@ -97,11 +109,15 @@ public class SystemManager extends Monitor implements ServletContextListener {
 		// TODO Auto-generated method stub
 		stop();
 		logger.info("SystemManager shutdown");
+		status = END;
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
 		// TODO Auto-generated method stub
+		logger.info(status);
+		if(status!=END)
+			return;
 		class_loader = new SystemClassLoader();
 		Thread loader_thrad = new Thread(){
 			public void run(){
@@ -123,15 +139,25 @@ public class SystemManager extends Monitor implements ServletContextListener {
 				}
 				logger.info("SystemManager running....");
 				
+				new org.jcommon.com.util.jmx.JmxManager().startup();
+				new StatusManager().startup();
+				
 				init();
 				initOperation();
-				if(!config.isStandby())
-					SystemManager.this.start();
+				
+				if(config.getCommand_port()>0){
+					command = new CommandMonitor(config.getCommand_port(),config.getCommand_key());
+				}
+				registerMBean();
+				SystemConfig.instance().registerMBean();
+				SystemManager.this.start();
 			}
 		};
 		loader_thrad.setName("class loader thread");
 		loader_thrad.setContextClassLoader(class_loader);
 		loader_thrad.start();
+		
+		status = INIT;
 	}
 
 	private void init() {
@@ -152,14 +178,16 @@ public class SystemManager extends Monitor implements ServletContextListener {
 		status = STARTING;
 		synchronized(store){
 			for(Object o : store.toArray()){
-				logger.info(o+" start ...");
+				logger.info(o+" start in mode"+(SystemConfig.instance().isStandby()?":STANDBY":":ACTIVE"));
 				SystemListener listener = (SystemListener)o;
 				if(listener.isSynchronized()){
 					try{
-						listener.startup();
-						SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName()+":STARTED");
+						if(!SystemConfig.instance().isStandby())
+							listener.startup();
+						SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), 
+								listener.getClass().getName()+(SystemConfig.instance().isStandby()?":STANDBY":":ACTIVE"));
 					}catch(Exception e){
-						SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName()+":STARTED:Exception");
+						SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName()+":Exception");
 						logger.error("", e);
 					}
 				}
@@ -167,14 +195,6 @@ public class SystemManager extends Monitor implements ServletContextListener {
 					ThreadManager.instance().execute(new ListenerTask((SystemListener)o,true));
 			}
 		}
-		TimerTaskManger.instance().schedule("SystemManager", new TimerTask(){
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				registerMBean();
-				SystemConfig.instance().registerMBean();
-			}			
-		}, 1000);
 		status = STARTED;
 	}
 	
@@ -188,7 +208,8 @@ public class SystemManager extends Monitor implements ServletContextListener {
 				SystemListener listener = (SystemListener)o;
 				if(listener.isSynchronized()){
 					try{
-						listener.shutdown();
+						if(!SystemConfig.instance().isStandby())
+							listener.shutdown();
 						SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName()+":STOPED");
 					}catch(Exception e){
 						SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName()+":STOPED:Exception");
@@ -198,7 +219,7 @@ public class SystemManager extends Monitor implements ServletContextListener {
 					ThreadManager.instance().execute(new ListenerTask(listener,false));
 			}
 		}
-		status = END;
+		status = INIT;
 	}
 	
 	public void restartSystem(){
@@ -283,11 +304,14 @@ public class SystemManager extends Monitor implements ServletContextListener {
 			// TODO Auto-generated method stub
 			if(listener==null)return;
 			if(start){
-				listener.startup();
-				SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName()+":STARTED");
+				if(!SystemConfig.instance().isStandby() && isRunning())
+					listener.startup();
+				SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), 
+						listener.getClass().getName()+(SystemConfig.instance().isStandby()?":STANDBY":":ACTIVE"));
 			}
 			else{
-				listener.shutdown();
+				if(!SystemConfig.instance().isStandby())
+					listener.shutdown();
 				SystemManager.this.addProperties(String.valueOf(listener.getClass().hashCode()), listener.getClass().getName()+":STOPED");
 			}
 		}
@@ -382,5 +406,13 @@ public class SystemManager extends Monitor implements ServletContextListener {
                 "void",
                 MBeanOperationInfo.ACTION));
 		super.initOperation();
+	}
+
+	public void setCommand(CommandMonitor command) {
+		this.command = command;
+	}
+
+	public CommandMonitor getCommand() {
+		return command;
 	}
 }

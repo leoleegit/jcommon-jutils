@@ -20,11 +20,21 @@ import org.json.JSONObject;
 public class JsonObject{
   protected static Logger logger = Logger.getLogger(JsonObject.class);
   private String json;
+  
+  private boolean encode = true;
+  private boolean decode = false;
 
   public JsonObject(String json){
     this.json = json;
     json2Object();
   }
+  
+  public JsonObject(String json,boolean decode){
+	    this.json = json;
+	    this.decode = decode;
+	    json2Object();
+  }
+  
   public JsonObject() {
   }
 
@@ -58,7 +68,7 @@ public class JsonObject{
     for (int index = 0; index < arr.length(); index++) {
       try {
         JSONObject jsonO = arr.getJSONObject(index);
-        Object o = newInstance(class_, jsonO.toString());
+        Object o = newInstance(class_, new Object[]{ jsonO.toString() });
         list.add(o);
       }
       catch (JSONException e) {
@@ -68,7 +78,7 @@ public class JsonObject{
     return list;
   }
 
-  public static Object json2Object(Object object, JSONObject json) {
+  public Object json2Object(Object object, JSONObject json) {
     if (object == null) return null;
     Object o = object;
     if (json == null) return o;
@@ -87,8 +97,12 @@ public class JsonObject{
             if (notNull(value)) {
               type = f.getType();
               Object args = null;
-              if (String.class == type)
-                args = value;
+              if (String.class == type){
+            	  if(isDecode()){
+            		  value = CoderUtils.decode(value);
+            	  }
+            	  args = value;
+              }
               else if ((Integer.class == type) || (Integer.TYPE == type))
                 args = Integer.valueOf(value);
               else if ((Boolean.class == type) || (Boolean.TYPE == type))
@@ -99,7 +113,7 @@ public class JsonObject{
                 args = Float.valueOf(value);
               else if (JsonObject.class.isAssignableFrom(type)) {
                 try {
-                  args = newInstance(type, value);
+                  args = newInstance(type, new Object[]{ value, isDecode() });
                 }
                 catch (SecurityException e) {
                   logger.warn(e);
@@ -147,7 +161,7 @@ public class JsonObject{
   }
 
   @SuppressWarnings("unchecked")
-  private static String toJson(JsonObject o)
+  private  String toJson(JsonObject o)
   {
     if (o == null) return null;
     StringBuilder sb = new StringBuilder();
@@ -194,9 +208,9 @@ public class JsonObject{
             }
             if (notNull(value)) {
               if (json)
-                sb.append(new StringBuilder().append("\"").append(CoderUtils.encode(name)).append("\"").append(":").append(value).toString());
+                sb.append(new StringBuilder().append("\"").append(isEncode()?CoderUtils.encode(name):name).append("\"").append(":").append(value).toString());
               else
-                sb.append(new StringBuilder().append("\"").append(CoderUtils.encode(name)).append("\"").append(":\"").append(encode(value)).append("\"").toString());
+                sb.append(new StringBuilder().append("\"").append(isEncode()?CoderUtils.encode(name):name).append("\"").append(":\"").append(isEncode()?CoderUtils.encode(value):value).append("\"").toString());
               sb.append(",");
             }
           }
@@ -210,48 +224,47 @@ public class JsonObject{
     return sb.toString();
   }
 
-  private static Object encode(String s)
-  {
-    StringBuffer sb = new StringBuffer();
-    for (int i = 0; i < s.length(); i++) {
-      char c = s.charAt(i);
-      switch (c) {
-      case '"':
-        sb.append("\\\"");
-        break;
-      case '\\':
-        sb.append("\\\\");
-        break;
-      case '/':
-        sb.append("\\/");
-        break;
-      case '\b':
-        sb.append("\\b");
-        break;
-      case '\f':
-        sb.append("\\f");
-        break;
-      case '\n':
-        sb.append("\\n");
-        break;
-      case '\r':
-        sb.append("\\r");
-        break;
-      case '\t':
-        sb.append("\\t");
-        break;
-      default:
-        sb.append(c);
-      }
-    }
-    return sb.toString();
-  }
+//  private static String encode(String s)
+//  {
+//    StringBuffer sb = new StringBuffer();
+//    for (int i = 0; i < s.length(); i++) {
+//      char c = s.charAt(i);
+//      switch (c) {
+//      case '"':
+//        sb.append("\\\"");
+//        break;
+//      case '\\':
+//        sb.append("\\\\");
+//        break;
+//      case '/':
+//        sb.append("\\/");
+//        break;
+//      case '\b':
+//        sb.append("\\b");
+//        break;
+//      case '\f':
+//        sb.append("\\f");
+//        break;
+//      case '\n':
+//        sb.append("\\n");
+//        break;
+//      case '\r':
+//        sb.append("\\r");
+//        break;
+//      case '\t':
+//        sb.append("\\t");
+//        break;
+//      default:
+//        sb.append(c);
+//      }
+//    }
+//    return sb.toString();
+//  }
 
-  private static Object newInstance(Class<?> class_, String args) {
+  private static Object newInstance(Class<?> class_, Object[] objs) {
     try {
       Class<?>[] par = { String.class };
       Constructor<?> con = class_.getConstructor(par);
-      Object[] objs = { args };
       return con.newInstance(objs);
     }
     catch (SecurityException e) {
@@ -285,5 +298,18 @@ public class JsonObject{
 
   private static boolean notNull(String str) {
     return (str != null) && (!"".equals(str));
+  }
+	
+  public  boolean isEncode() {
+	return encode;
+  }
+  public boolean isDecode() {
+	return decode;
+  }
+  public void setDecode(boolean decode) {
+	this.decode = decode;
+  }
+  public void setEncode(boolean encode) {
+	this.encode = encode;
   }
 }
