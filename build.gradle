@@ -4,18 +4,28 @@
 	
 	   
 	group   = 'jcommon'
-    version = '1.0-v20150416'
+    version = '1.0-v20150418'
     
+    ext{
+		artifactId = 'jcommon-jutils'
+		packaging  = 'jar'
+		ftp_url    = 'ftp://192.168.2.49'
+		ftp_user   = 'deploy'
+		ftp_passwd = 'deploy.com'
+	}
+
+	configurations {
+	    deployerJars
+	}
+
     jar {
-		//baseName = 'jcommon-jutils'
 	    manifest{
 	    	attributes 'provider':'gradle'
 	    }
     }
 
-    repositories {
-       
-       
+    repositories {   
+    
        maven {
 			url 'http://192.168.2.49:9090/maven-proxy-webapp/repository'
 	   }
@@ -25,8 +35,9 @@
 
     dependencies {
         testCompile 'junit:junit:4.11'
+        deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
         compile 'log4j:log4j:1.2.16'
-        runtime 'javax.servlet:servlet-api:2.5'
+        compile 'javax.servlet:servlet-api:2.5'
         compile 'dom4j:dom4j:1.6.1'
         compile 'com.sun.jdmk:jmxtools:1.2.1'
         compile 'org.json:json:20080701'
@@ -37,13 +48,27 @@
  
  
 	test {
-		systemProperties 'property': 'value'
+		systemProperties 'MODE': 'ACTIVE'
+		//systemProperties 'MODE': 'STANDBY'
 	}
 
 	uploadArchives {
-		repositories {
-		   flatDir {
-			   dirs 'repos'
-		   }
-		}
+		repositories.mavenDeployer {
+        	configuration = configurations.deployerJars
+            repository(url: "${project.ftp_url}"){
+	            authentication(userName: "${project.ftp_user}", password: "${project.ftp_passwd}")
+	        }
+            pom.groupId = "${project.group}"
+        	pom.artifactId = "${project.artifactId}"
+        	pom.version = "${project.version}"
+        }
+	}
+	
+	install {
+	    repositories.mavenInstaller {
+	      	pom.groupId = "${project.group}"
+        	pom.artifactId = "${project.artifactId}"
+        	pom.version = "${project.version}"
+        	pom.packaging = "${project.packaging}"
+	    }
 	}
