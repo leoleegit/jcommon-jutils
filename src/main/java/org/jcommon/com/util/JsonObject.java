@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.jcommon.com.util.CoderUtils;
 import org.jcommon.com.util.JsonUtils;
@@ -21,17 +22,17 @@ public class JsonObject{
   protected static Logger logger = Logger.getLogger(JsonObject.class);
   private String json;
   
-  private boolean encode = true;
-  private boolean decode = false;
+  private boolean encode_ = true;
+  private boolean decode_ = false;
 
   public JsonObject(String json){
     this.json = json;
     json2Object();
   }
   
-  public JsonObject(String json,boolean decode){
+  public JsonObject(String json, boolean decode){
 	    this.json = json;
-	    this.decode = decode;
+	    this.decode_ = decode;
 	    json2Object();
   }
   
@@ -113,7 +114,7 @@ public class JsonObject{
                 args = Float.valueOf(value);
               else if (JsonObject.class.isAssignableFrom(type)) {
                 try {
-                  args = newInstance(type, new Object[]{ value, isDecode() });
+                  args = newInstance(type, !isDecode()?new Object[]{value}:new Object[]{value,isDecode()});
                 }
                 catch (SecurityException e) {
                   logger.warn(e);
@@ -177,7 +178,7 @@ public class JsonObject{
         	  continue;
           String value = null;
           String name = f.getName();
-          boolean json = false;
+         // boolean json = false;
           if (!"json".equals(name))
           {
             type = f.getType();
@@ -187,6 +188,12 @@ public class JsonObject{
             if (m != null) {
               if (String.class == type) {
                 value = (String)m.invoke(o, new Object[0]);
+                if(isEncode() && notNull(value)){
+                	value = CoderUtils.encode(value);
+                }
+                if(notNull(value)){
+                	value = "\"" + value +"\"";
+                }
               } else if ((Integer.class == type) || (Integer.TYPE == type)) {
                 value = String.valueOf((Integer)m.invoke(o, new Object[0]));
               } else if ((Boolean.class == type) || (Boolean.TYPE == type)) {
@@ -199,19 +206,17 @@ public class JsonObject{
                 Object o1 = m.invoke(o, new Object[0]);
                 JsonObject jsonObj = o1 != null ? (JsonObject)o1 : null;
                 value = jsonObj!=null?jsonObj.toJson():null;
-                json = true;
               } else if (Collection.class.isAssignableFrom(type)) {
             	  List<Object> jsonObj = (List<Object>) m.invoke(o, new Object[0]);
                   value = list2Json(jsonObj);
-                  json = true;
               }
             }
             if (notNull(value)) {
-              if (json)
-                sb.append(new StringBuilder().append("\"").append(isEncode()?CoderUtils.encode(name):name).append("\"").append(":").append(value).toString());
-              else
-                sb.append(new StringBuilder().append("\"").append(isEncode()?CoderUtils.encode(name):name).append("\"").append(":\"").append(isEncode()?CoderUtils.encode(value):value).append("\"").toString());
-              sb.append(",");
+              //if (json)
+              //  sb.append(new StringBuilder().append("\"").append(isEncode()?CoderUtils.encode(name):name).append("\"").append(":").append(value).toString());
+              //else
+              sb.append("\"").append(isEncode()?CoderUtils.encode(name):name).append("\"").
+        		  append(":").append(value).append(",");
             }
           }
         }
@@ -263,7 +268,7 @@ public class JsonObject{
 
   private static Object newInstance(Class<?> class_, Object[] objs) {
     try {
-      Class<?>[] par = { String.class };
+      Class<?>[] par = objs.length>1?new Class<?>[]{ String.class, boolean.class }:new Class<?>[]{ String.class};
       Constructor<?> con = class_.getConstructor(par);
       return con.newInstance(objs);
     }
@@ -301,15 +306,15 @@ public class JsonObject{
   }
 	
   public  boolean isEncode() {
-	return encode;
+	return encode_;
   }
   public boolean isDecode() {
-	return decode;
+	return decode_;
   }
   public void setDecode(boolean decode) {
-	this.decode = decode;
+	this.decode_ = decode;
   }
   public void setEncode(boolean encode) {
-	this.encode = encode;
+	this.encode_ = encode;
   }
 }

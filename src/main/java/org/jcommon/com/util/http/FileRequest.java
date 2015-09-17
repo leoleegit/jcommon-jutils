@@ -11,59 +11,46 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.Date;
 
-public class FileRequest extends HttpRequest
-{
+import org.jcommon.com.util.BufferUtils;
+
+public class FileRequest extends HttpRequest{
   String crlf = "\r\n";
   String twoHyphens = "--";
   String boundary = "*****";
   private File file;
-  private String attachmentName;
-  private String attachmentFileName;
+  private String filename;
   private String content_type;
+
+  public FileRequest(String url, File file, HttpListener listener) {
+	  super(url,listener);
+	  this.file = file;
+  }
   
-  public FileRequest(String url, HttpListener listener, File file)
-  {
-    super(url, listener);
-    initFile(file);
+  public FileRequest(String url, File file, String method, HttpListener listener) {
+	  super(url,null,method,listener);
+	  this.file = file;
+	  if(file!=null){
+		  this.filename = file.getName();
+		  this.content_type = ContentType.getContentType(file).type;
+	  }
+  }
+  
+  public FileRequest(String url, File file, String filename, String content_type, HttpListener listener) {
+	  super(url,null,HttpRequest.POST,listener);
+	  this.file         = file;
+	  this.filename     = filename;
+	  this.content_type = content_type;
   }
 
-  public FileRequest(String url, HttpListener listener, boolean trusted, File file) {
-    super(url, listener, trusted);
-
-    initFile(file);
-  }
-
-  public FileRequest(String url, String method, HttpListener listener, boolean trusted, File file) {
-    super(url, "", method, listener, trusted);
-
-    initFile(file);
-  }
-
-  public FileRequest(String url, String method, HttpListener listener, File file) {
-    this(url, method, listener, true, file);
-  }
-
-  public void initFile(File file) {
-    this.file = file;
-    if (file != null) {
-      this.attachmentFileName = file.getName();
-      this.attachmentName = this.attachmentFileName.substring(0, this.attachmentFileName.indexOf(".") != -1 ? this.attachmentFileName.indexOf(".") : this.attachmentFileName.length() - 1);
-      logger.info(String.format("attachmentFileName:%s;attachmentName:%s", new Object[] { this.attachmentFileName, this.attachmentName }));
-    }
-  }
-
-  public void run()
-  {
-    if ("POST" == this.method_)
+  public void run(){
+    if (HttpRequest.POST == this.method_)
       upload();
     else
       download();
   }
 
-  private void download()
-  {
+  private void download(){
     HttpURLConnection httpUrlConnection = null;
     try {
       URL url = new URL(this.url_);
@@ -77,73 +64,72 @@ public class FileRequest extends HttpRequest
       int responseCode = httpUrlConnection.getResponseCode();
 
       if (responseCode == 200) {
-        if ((this.file == null) || (this.file.isDirectory())) {
-          if ((this.file != null) && (this.file.isDirectory()) && (!this.file.exists())) {
-            this.file.mkdirs();
-          }
-          String tDir = (this.file != null) && (this.file.isDirectory()) ? this.file.getAbsolutePath() : System.getProperty("java.io.tmpdir");
-          String raw = httpUrlConnection.getHeaderField("Content-Disposition");
+    	  String raw = httpUrlConnection.getHeaderField("Content-Disposition");
           String content_type = httpUrlConnection.getHeaderField("Content-Type");
           setContent_type(content_type);
-          if ("text/plain".equalsIgnoreCase(content_type)) {
-            InputStream responseStream = new BufferedInputStream(httpUrlConnection.getInputStream());
+          if(file==null || file.isDirectory()){
+        	  if(file!=null && !file.exists()){
+        		  file.mkdirs();
+        	  }else{
+        		  file = new File(System.getProperty("java.io.tmpdir"));
+        	  }
+        	  String fileName = null;
 
-            BufferedReader responseStreamReader = new BufferedReader(new InputStreamReader(responseStream));
-            String line = "";
-            while ((line = responseStreamReader.readLine()) != null)
-            {
-              this.sResult.append(line).append("\n");
-            }
-            responseStreamReader.close();
-            logger.info("[URL][response][failure]" + this.sResult + "\n" + this.url_);
-            if (this.listener_ != null) this.listener_.onFailure(this, this.sResult);
-            return;
+              if ((raw != null) && (raw.indexOf("=") != -1)) {
+                  fileName = raw.split("=")[1];
+                  if (fileName.startsWith("\""))
+                	  fileName = fileName.substring(1);
+                  if (fileName.endsWith("\""))
+                	  fileName = fileName.substring(0, fileName.length() - 1);
+              } else {
+                  fileName = BufferUtils.generateRandom(20);
+              }
+              file = new File(file.getAbsolutePath(),fileName);
           }
-          String fileName = null;
+//          if ("text/plain".equalsIgnoreCase(content_type)) {
+//              InputStream responseStream = new BufferedInputStream(httpUrlConnection.getInputStream());
+//
+//              BufferedReader responseStreamReader = new BufferedReader(new InputStreamReader(responseStream));
+//              String line = "";
+//              while ((line = responseStreamReader.readLine()) != null)
+//              {
+//                this.sResult.append(line).append("\n");
+//              }
+//              responseStreamReader.close();
+//              logger.info("[URL][response][failure]" + this.sResult + "\n" + this.url_);
+//              if (this.listener_ != null) this.listener_.onFailure(this, this.sResult);
+//              return;
+//          }
+           if (this.file.exists()) {
+               this.file.mkdir();
+           }
+           InputStream in = httpUrlConnection.getInputStream();
+           FileOutputStream out = new FileOutputStream(this.file);
 
-          if ((raw != null) && (raw.indexOf("=") != -1)) {
-            fileName = raw.split("=")[1];
-            if (fileName.startsWith("\""))
-              fileName = fileName.substring(1);
-            if (fileName.endsWith("\""))
-              fileName = fileName.substring(0, fileName.length() - 1);
-          } else {
-            fileName = "." + new Date().getTime();
-          }
-          this.file = new File(tDir, fileName);
-        }
-        if (this.file.exists()) {
-          this.file.mkdir();
-        }
-        InputStream in = httpUrlConnection.getInputStream();
-        FileOutputStream out = new FileOutputStream(this.file);
-
-        byte[] b = new byte[1024];
-        int count;
-        while ((count = in.read(b)) > 0) {
-          out.write(b, 0, count);
-        }
-        out.flush();
-        out.close();
-        in.close();
-        this.sResult.append("download file done:" + this.file.getAbsolutePath());
-        if (this.listener_ != null) this.listener_.onSuccessful(this, this.sResult); 
+           byte[] b = new byte[1024];
+           int count;
+           while ((count = in.read(b)) > 0) {
+               out.write(b, 0, count);
+           }
+           out.flush();
+           out.close();
+           in.close();
+           this.sResult.append("download file done:" + this.file.getAbsolutePath());
+           if (this.listener_ != null) this.listener_.onSuccessful(this, this.sResult); 
       }
       else if (responseCode >= 400) {
         InputStream responseStream = new BufferedInputStream(httpUrlConnection.getInputStream());
 
         BufferedReader responseStreamReader = new BufferedReader(new InputStreamReader(responseStream));
         String line = "";
-        while ((line = responseStreamReader.readLine()) != null)
-        {
+        while ((line = responseStreamReader.readLine()) != null){
           this.sResult.append(line).append("\n");
         }
         responseStreamReader.close();
         logger.info("[URL][response][failure]" + this.sResult + "\n" + this.url_);
         if (this.listener_ != null) this.listener_.onFailure(this, this.sResult); 
       }
-      else
-      {
+      else{
         this.sResult.append("[URL][response][failure][code : " + responseCode + " ]");
         if (this.listener_ != null) this.listener_.onFailure(this, this.sResult);
         logger.info("[URL][response][failure][code : " + responseCode + " ]" + "\n" + this.url_);
@@ -176,7 +162,8 @@ public class FileRequest extends HttpRequest
       DataOutputStream out = new DataOutputStream(httpUrlConnection.getOutputStream());
 
       out.writeBytes(this.twoHyphens + this.boundary + this.crlf);
-      out.writeBytes("Content-Disposition: form-data; name=\"" + this.attachmentName + "\";filename=\"" + this.attachmentFileName + "\"" + this.crlf);
+      //out.writeBytes("Content-Type: " + this.content_type + this.crlf);
+      out.writeBytes("Content-Disposition: form-data; name=\"" + this.filename + "\";filename=\"" + this.filename + "\"" + this.crlf);
       out.writeBytes(this.crlf);
 
       FileInputStream fis = new FileInputStream(this.file);

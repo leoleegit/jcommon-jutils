@@ -133,6 +133,7 @@ public class HttpRequest
       else {
         httpConnection = (HttpURLConnection)url.openConnection();
       }
+      
       httpConnection.setConnectTimeout(10000);
       httpConnection.setReadTimeout(10000);
       httpConnection.setRequestMethod(this.method_);
@@ -211,7 +212,7 @@ public class HttpRequest
       }
     }
   }
-
+//https://10.193.32.57:8043/donut/do/servChat.do
   public SSLSocketFactory verifyCert() throws Exception {
     if ((this.url_ != null) && (this.url_.startsWith("https"))) {
       String host = this.url_.substring(this.url_.indexOf("/", 7) + 1, this.url_.indexOf("/", 9));
@@ -397,18 +398,19 @@ public class HttpRequest
     }
 
     public X509Certificate[] getAcceptedIssuers() {
-      throw new UnsupportedOperationException();
+      //throw new UnsupportedOperationException();
+    	return null;
     }
 
     public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException
     {
-      throw new UnsupportedOperationException();
+      //throw new UnsupportedOperationException();
     }
 
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException
     {
-      this.chain = chain;
-      this.tm.checkServerTrusted(chain, authType);
+      //this.chain = chain;
+      //this.tm.checkServerTrusted(chain, authType);
     }
   }
 

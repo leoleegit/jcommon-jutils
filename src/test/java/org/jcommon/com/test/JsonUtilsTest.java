@@ -21,7 +21,7 @@ public class JsonUtilsTest {
 	 public static void main(String[] args) throws Exception{
 		 
 		 //System.out.println(new JsonUtilsTest().toJson());
-		 JSONObject jo = new JSONObject("{\"12323\",\"4234324\"}");
-		 System.out.println(jo);
+		 //JSONObject jo = new JSONObject("{\"12323\",\"4234324\"}");
+		 System.out.println(new String("中文".getBytes("utf-8")));
 	 }
 }

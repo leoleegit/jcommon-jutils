@@ -15,7 +15,7 @@ public class PostTest implements HttpListener{
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		DOMConfigurator.configure("log4j.xml");
+		//DOMConfigurator.configure("log4j.xml");
 //		HttpRequest post = new HttpRequest("http://192.168.2.72/ws/command?cmd=wakeup",new PostTest());
 //		post.setAuthorization("root1", "password.com");
 //		ThreadManager.instance().execute(post);
@@ -29,8 +29,10 @@ public class PostTest implements HttpListener{
 //		HttpRequest request = new HttpRequest(url,xml,"POST",new PostTest());
 //		ThreadManager.instance().execute(request);
 		//String url = "https://192.168.1.33/wss/FacebookPage";
-		String url = "https://livechat6.pccw.com/chat/livechat.jsp";
-		HttpRequest request = new HttpRequest(url,new PostTest(),true);
+		String url = args[0];
+		System.out.println(url);
+		//String url = "https://livechat6.pccw.com/chat/livechat.jsp";
+		HttpRequest request = new HttpRequest(url,new PostTest());
 		ThreadManager.instance().execute(request);
 //		String ss = "C:\\Users\\Administrator\\Desktop\\cipango-distribution-2.0.0\\media\\NhRCvGU8tapYzrstTBLrAVmQclXi9tIYV_dA0VmnS9J_elwvqw44HS7jWxBca8it.jpg";
 	}
