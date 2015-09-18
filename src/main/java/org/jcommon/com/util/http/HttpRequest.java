@@ -57,7 +57,8 @@ public class HttpRequest
   protected String url_;
   protected HttpListener listener_;
   private String content_;
-  private String charset_;
+  private String charset_ = "UTF-8";
+
   protected String method_;
   private String passphrase = "changeit";
   private String user;
@@ -384,6 +385,14 @@ public class HttpRequest
   public void setAuthorization(String user, String password) {
     this.user = user;
     this.password = password;
+  }
+  
+  public String getCharset() {
+	  return charset_;
+  }
+	
+  public void setCharset(String charset_) {
+	  this.charset_ = charset_;
   }
 
   private static class SavingTrustManager
