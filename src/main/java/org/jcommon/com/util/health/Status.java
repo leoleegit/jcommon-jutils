@@ -64,4 +64,10 @@ public class Status extends JsonObject {
 	public  boolean isEncode() {
 		return false;
     }
+
+	@Override
+	public void setListObject(Object args, Object args2) {
+		// TODO Auto-generated method stub
+		
+	}
 }

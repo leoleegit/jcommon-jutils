@@ -45,15 +45,16 @@ public class JsonObjectTest extends JsonObject{
 		JsonObjectTest jt = new JsonObjectTest(null);
 		jt.setName("中文");
 		jt.setUrl("https://hello.com/test");
+		jt.setCode(-1);
 		
 		
 		JsonObjectTest jt1 = new JsonObjectTest(jt.toJson());
-		jt.setJson_test(jt1);
+		//jt.setJson_test(jt1);
 		
-		jt = new JsonObjectTest(jt.toJson());
-		System.out.println(jt.toJson());
+		jt1 = new JsonObjectTest(jt.toJson());
+		System.out.println(jt1.getCode());
 		
-		System.out.println(jt.getJson_test().getUrl());
+		//System.out.println(jt.getJson_test().getUrl());
 	}
 	
 	public void setName(String name) {
@@ -77,6 +78,12 @@ public class JsonObjectTest extends JsonObject{
 
 	public void setJson_test(JsonObjectTest json_test) {
 		this.json_test = json_test;
+	}
+
+	@Override
+	public void setListObject(Object args, Object args2) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

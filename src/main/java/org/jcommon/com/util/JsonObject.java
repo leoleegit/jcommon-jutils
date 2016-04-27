@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jcommon.com.util.CoderUtils;
@@ -18,7 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonObject{
+public abstract class JsonObject{
   protected static Logger logger = Logger.getLogger(JsonObject.class);
   private String json;
   
@@ -105,11 +107,11 @@ public class JsonObject{
             	  args = value;
               }
               else if ((Integer.class == type) || (Integer.TYPE == type))
-                args = Integer.valueOf(value);
+                args = isNumeric(value)?Integer.valueOf(value):null;
               else if ((Boolean.class == type) || (Boolean.TYPE == type))
                 args = Boolean.valueOf(Boolean.parseBoolean(value));
               else if ((Long.class == type) || (Long.TYPE == type))
-                args = Long.valueOf(value);
+                args = isNumeric(value)?Long.valueOf(value):null;
               else if ((Float.class == type) || (Float.TYPE == type))
                 args = Float.valueOf(value);
               else if (JsonObject.class.isAssignableFrom(type)) {
@@ -124,7 +126,15 @@ public class JsonObject{
                   logger.warn(e);
                   continue;
                 }
+              }else if (Collection.class.isAssignableFrom(type)) {
+//            	  if(isDecode()){
+//            		  value = CoderUtils.decode(value);
+//            	  }
+            	  args = value;
+            	  setListObject(name, args);
+            	  continue;
               }
+              
               try
               {
                 if (args != null)
@@ -142,6 +152,20 @@ public class JsonObject{
     }
     return o;
   }
+  
+  public static boolean isNumeric(String str){ 
+		if(str==null)return false;
+		if(str.startsWith("-"))
+			str = str.substring(1);
+	    Pattern pattern = Pattern.compile("[0-9]*"); 
+	    Matcher isNum = pattern.matcher(str);
+	    if( !isNum.matches() ){
+	        return false; 
+	    } 
+	    return true; 
+  }
+
+  public void setListObject(Object args, Object args2){};
 
   public String toJson() {
     return toJson(this);
@@ -273,22 +297,22 @@ public class JsonObject{
       return con.newInstance(objs);
     }
     catch (SecurityException e) {
-      logger.warn(e);
+    	logger.error("",e);
     }
     catch (IllegalArgumentException e) {
-      logger.warn(e);
+    	logger.error("",e);
     }
     catch (NoSuchMethodException e) {
-      logger.warn(e);
+    	logger.error("",e);
     }
     catch (InstantiationException e) {
-      logger.warn(e);
+    	logger.error("",e);
     }
     catch (IllegalAccessException e) {
-      logger.warn(e);
+    	logger.error("",e);
     }
     catch (InvocationTargetException e) {
-      logger.warn(e);
+      logger.error("",e);
     }
     return null;
   }

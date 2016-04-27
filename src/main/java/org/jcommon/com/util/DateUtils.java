@@ -12,6 +12,7 @@
 // ========================================================================
 package org.jcommon.com.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,5 +35,12 @@ public class DateUtils {
 	public static String getNowSinceHour(Date now){
 		SimpleDateFormat f=new SimpleDateFormat("HH:mm:ss");
 		return f.format(now);
+	}
+	
+	public static Date getDate(String date, String format) throws ParseException{
+		if(date==null)
+			return null;
+		SimpleDateFormat f=new SimpleDateFormat(format);
+		return f.parse(date);
 	}
 }

@@ -24,6 +24,8 @@ public class StatusManager extends Monitor{
 	}
 	
 	public void addStatus(Status status){
+		if(status==null || status.getName()==null)
+			return;
 		Status s = getStatusByName(status!=null?status.getName():null);
 		if(s!=null)
 			removeStatus(s);
@@ -32,6 +34,8 @@ public class StatusManager extends Monitor{
 	}
 	
 	public boolean removeStatus(Status status){
+		if(status==null || status.getName()==null)
+			return false;
 		if(this.status.contains(status)){
 			super.removeProperties(status.getName());
 			return this.status.remove(status);
