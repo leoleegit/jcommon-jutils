@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -114,6 +115,8 @@ public abstract class JsonObject{
                 args = isNumeric(value)?Long.valueOf(value):null;
               else if ((Float.class == type) || (Float.TYPE == type))
                 args = Float.valueOf(value);
+              else if (Timestamp.class == type)
+                args = isNumeric(value)?new Timestamp(Long.valueOf(value)):null;
               else if (JsonObject.class.isAssignableFrom(type)) {
                 try {
                   args = newInstance(type, !isDecode()?new Object[]{value}:new Object[]{value,isDecode()});
@@ -226,6 +229,9 @@ public abstract class JsonObject{
                 value = String.valueOf((Long)m.invoke(o, new Object[0]));
               } else if ((Float.class == type) || (Float.TYPE == type)) {
                 value = String.valueOf((Float)m.invoke(o, new Object[0]));
+              } else if (Timestamp.class == type) {
+            	Object o1 = m.invoke(o, new Object[0]);
+                value = o1!=null?String.valueOf(((Timestamp)o1).getTime()):null;
               } else if (JsonObject.class.isAssignableFrom(type)) {
                 Object o1 = m.invoke(o, new Object[0]);
                 JsonObject jsonObj = o1 != null ? (JsonObject)o1 : null;
