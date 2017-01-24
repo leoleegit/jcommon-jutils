@@ -89,17 +89,17 @@
   
   <repositories>
     <repository>
-      <id>protelgz.dyndns.org</id>
+      <id>spotlightx.cn</id>
       <!-- url>http://192.168.2.49/maven-proxy-webapp/repository/</url-->
-	  <url>http://protelgz.f3322.org:9090/maven-proxy-webapp/repository/</url>
+	  <url>http://spotlightx.cn:9090/maven-proxy-webapp/repository/</url>
     </repository>
   </repositories>
   
   <pluginRepositories>
    <pluginRepository>
-     <id>protelgz.dyndns.org</id>
+     <id>spotlightx.cn</id>
      <!--  url>http://192.168.2.49/maven-proxy-webapp/repository/</url-->
-	 <url>http://protelgz.f3322.org:9090/maven-proxy-webapp/repository/</url>
+	 <url>http://spotlightx.cn:9090/maven-proxy-webapp/repository/</url>
     </pluginRepository>
   </pluginRepositories>
 </project>
